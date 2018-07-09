@@ -2,4 +2,7 @@ html
   head
     title WebGL Edge Detection
   body
-    div Test
+    .container
+      canvas(id="canvas" width="500" height="500")
+    img(id="test-image" src="/mountain-range.jpg" style="display:none;")
+    script(src="/dist/bundle.js" type="text/javascript")

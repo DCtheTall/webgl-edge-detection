@@ -5,14 +5,22 @@
   "main": "bin/start.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bin/start"
+    "start": "node bin/start",
+    "dev": "webpack --mode development --progress --watch",
+    "build": "webpack --mode production"
   },
   "author": "Dylan Cutler",
   "license": "ISC",
   "dependencies": {
     "debug": "^3.1.0",
     "express": "^4.16.3",
+    "glslify-loader": "^1.0.2",
     "morgan": "^1.9.0",
-    "pug": "^2.0.3"
+    "pug": "^2.0.3",
+    "raw-loader": "^0.5.1",
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.9.2",
+    "webpack": "^4.15.1",
+    "webpack-cli": "^3.0.8"
   }
 }
