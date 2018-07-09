@@ -1,0 +1,4 @@
+public/dist/*
+!public/dist/.gitkeep
+.vscode
+node_modules/
