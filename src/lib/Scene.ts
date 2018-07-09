@@ -1,6 +1,7 @@
 export default class Scene {
   private gl: WebGLRenderingContext;
   private vertexBuffer: WebGLBuffer;
+  private textureCoordBuffer: WebGLBuffer;
   private shaderProgram: WebGLShader;
 
   constructor(
@@ -9,6 +10,7 @@ export default class Scene {
     this.gl = <WebGLRenderingContext>(
       canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
     this.vertexBuffer = this.gl.createBuffer();
+    this.textureCoordBuffer = this.gl.createBuffer();
   }
 
   private compileShader(shaderSource: string, shaderType: number): WebGLShader {
