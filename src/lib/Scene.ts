@@ -44,10 +44,8 @@ export default class Scene {
       this.textureCoordBuffer,
       this.shaderProgram.attributeLocations.aTextureCoord,
       new Float32Array([
-        0, 1, 0, 0, 1, 1, 1, 0]),
+        0, 0, 0, 1, 1, 0, 1, 1]),
     );
-
-    this.texture = this.gl.createTexture();
   }
 
   private sendVectorAttribute(
@@ -62,8 +60,19 @@ export default class Scene {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, values, this.gl.DYNAMIC_DRAW);
   }
 
+  public setTexture(image: HTMLImageElement) {
+    const texture = this.gl.createTexture();
+    const isPowerOfTwo = (val: number): boolean => !(val & (val - 1));
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
+    this.gl.generateMipmap(this.gl.TEXTURE_2D);
+  }
+
   public render() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.uniform1i(this.shaderProgram.uniformLocations.uTextureSampler2D, 0);
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
   }
 }
