@@ -18,8 +18,9 @@ export default class ShaderProgram {
   private gl: WebGLRenderingContext;
   private shaderSources: string[];
   private program: WebGLProgram;
-  private attributeLocations: { [index: string]: number };
-  private uniformLocations: { [index: string]: WebGLUniformLocation };
+
+  public attributeLocations: { [index: string]: number };
+  public uniformLocations: { [index: string]: WebGLUniformLocation };
 
   constructor(params: ShaderProgramParams) {
     this.params = params;
@@ -63,31 +64,18 @@ export default class ShaderProgram {
     if (this.attributeLocations) {
       Object.keys(this.params.attributeLocations).forEach((attributeName: string) =>
         this.attributeLocations[attributeName] =
-          this.gl.getAttribLocation(program, attributeName));
+          this.gl.getAttribLocation(
+            this.program, this.params.attributeLocations[attributeName]));
     }
     if (this.uniformLocations) {
-      Object.keys(this.params.uniformLocations).forEach((unifornName: string) =>
-        this.uniformLocations[unifornName] =
-          this.gl.getUniformLocation(program, unifornName));
+      Object.keys(this.params.uniformLocations).forEach((uniformName: string) =>
+        this.uniformLocations[uniformName] =
+          this.gl.getUniformLocation(
+            this.program, this.params.uniformLocations[uniformName]));
     }
-  }
-
-  private bufferVectorAttribute(dimension: number, buffer: WebGLBuffer, attrLocation: number, values: Float32Array): void {
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-    this.gl.vertexAttribPointer(attrLocation, dimension, this.gl.FLOAT, false, 0, 0);
-    this.gl.enableVertexAttribArray(attrLocation);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, values, this.gl.DYNAMIC_DRAW);
   }
 
   public useProgram() {
     this.gl.useProgram(this.program);
-  }
-
-  public sendTexturePlaneAttributes() {
-
-  }
-
-  public sendTexturePlaneUniforms() {
-
   }
 }

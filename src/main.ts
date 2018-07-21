@@ -4,4 +4,5 @@ import Scene from './lib/Scene';
   const testImage = <HTMLImageElement>document.getElementById('test-image');
   const canvas = <HTMLCanvasElement>document.getElementById('canvas');
   const scene = new Scene(canvas);
+  scene.render();
 })();
