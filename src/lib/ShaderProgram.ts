@@ -1,15 +1,27 @@
+interface ShaderValue {
+  type?: string;
+  locationName: string;
+  data?: number|number[];
+  buffer?: WebGLBuffer;
+}
+
+interface ShaderAttribute extends ShaderValue {
+  location?: number;
+}
+
+interface ShaderUniform extends ShaderValue {
+  location?: WebGLUniformLocation;
+}
+
 interface ShaderProgramParams {
   gl: WebGLRenderingContext;
   vertexShader: string;
   fragmentShader: string;
-  attributeLocations?: {
-    [index: string]: string;
-    aTextureCoord?: string;
-    aVertexPosition?: string;
+  attributes?: {
+    [index: string]: ShaderAttribute;
   };
-  uniformLocations?: {
-    [index: string]: string;
-    uTextureSampler2D: string;
+  uniforms?: {
+    [index: string]: ShaderUniform;
   };
 }
 
@@ -19,17 +31,22 @@ export default class ShaderProgram {
   private shaderSources: string[];
   private program: WebGLProgram;
 
-  public attributeLocations: { [index: string]: number };
-  public uniformLocations: { [index: string]: WebGLUniformLocation };
+  public attributes: { [index: string]: ShaderAttribute };
+  public uniforms: { [index: string]: ShaderUniform };
 
-  constructor(params: ShaderProgramParams) {
-    this.params = params;
-    this.gl = params.gl;
+  constructor({
+    gl,
+    vertexShader,
+    fragmentShader,
+    attributes = {},
+    uniforms = {},
+  }: ShaderProgramParams) {
+    this.gl = gl;
     this.shaderSources = [];
-    this.shaderSources[this.gl.VERTEX_SHADER] = params.vertexShader;
-    this.shaderSources[this.gl.FRAGMENT_SHADER] = params.fragmentShader;
-    if (params.attributeLocations) this.attributeLocations = {};
-    if (params.uniformLocations) this.uniformLocations = {};
+    this.shaderSources[this.gl.VERTEX_SHADER] = vertexShader;
+    this.shaderSources[this.gl.FRAGMENT_SHADER] = fragmentShader;
+    this.attributes = attributes;
+   this.uniforms = uniforms;
     this.initShaderProgram();
   }
 
@@ -61,18 +78,55 @@ export default class ShaderProgram {
       throw new Error('Could not initialize shader program.');
     }
     this.program = program;
-    if (this.attributeLocations) {
-      Object.keys(this.params.attributeLocations).forEach((attributeName: string) =>
-        this.attributeLocations[attributeName] =
-          this.gl.getAttribLocation(
-            this.program, this.params.attributeLocations[attributeName]));
-    }
-    if (this.uniformLocations) {
-      Object.keys(this.params.uniformLocations).forEach((uniformName: string) =>
-        this.uniformLocations[uniformName] =
-          this.gl.getUniformLocation(
-            this.program, this.params.uniformLocations[uniformName]));
-    }
+    Object.keys(this.attributes).forEach((key: string) => {
+      const attribute = this.attributes[key];
+      const { locationName } = attribute;
+      attribute.buffer = this.gl.createBuffer();
+      attribute.location = this.gl.getAttribLocation(this.program, locationName);
+    });
+    Object.keys(this.uniforms).forEach((key: string) => {
+      const uniform = this.uniforms[key];
+      const { locationName } = uniform;
+      uniform.buffer = this.gl.createBuffer();
+      uniform.location = this.gl.getUniformLocation(this.program, locationName);
+    });
+  }
+
+  private sendVectorAttribute(
+    dimension: number,
+    buffer: WebGLBuffer,
+    attribLocation: number,
+    values: number[],
+  ): void {
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    this.gl.vertexAttribPointer(attribLocation, dimension, this.gl.FLOAT, false, 0, 0);
+    this.gl.enableVertexAttribArray(attribLocation);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(values), this.gl.DYNAMIC_DRAW);
+  }
+
+  public sendAttributes() {
+    Object.keys(this.attributes).forEach((key: string) => {
+      const attribute = this.attributes[key];
+      switch (attribute.type) {
+        case 'vec2':
+          this.sendVectorAttribute(
+            2,
+            attribute.buffer,
+            attribute.location,
+            <number[]>attribute.data);
+          break;
+        default:
+          throw new Error(`Invalid type provided for attribute ${key} provided.`);
+      }
+    })
+  }
+
+  public setAttributeData(attrbuteName: string, data: number | number[]) {
+    this.attributes[attrbuteName].data = data;
+  }
+
+  public setUniformData(uniformName: string, data: number | number[]) {
+    this.uniforms[uniformName].data = data;
   }
 
   public useProgram() {
