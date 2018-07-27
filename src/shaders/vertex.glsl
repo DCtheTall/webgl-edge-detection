@@ -7,5 +7,5 @@ varying vec2 v_TextureCoord;
 
 void main() {
   v_TextureCoord = a_TextureCoord;
-  gl_Position = vec4(a_VertexPosition.xy, 0., 1.);
+  gl_Position = vec4(a_VertexPosition, 0., 1.);
 }

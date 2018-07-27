@@ -1,5 +1,11 @@
+enum ShaderProgramTypes {
+  FLOAT,
+  VECTOR2,
+}
+
+
 interface ShaderValue {
-  type?: string;
+  type?: ShaderProgramTypes;
   locationName: string;
   data?: number|number[];
   buffer?: WebGLBuffer;
@@ -11,6 +17,7 @@ interface ShaderAttribute extends ShaderValue {
 
 interface ShaderUniform extends ShaderValue {
   location?: WebGLUniformLocation;
+  sampler?: boolean;
 }
 
 interface ShaderProgramParams {
@@ -26,6 +33,7 @@ interface ShaderProgramParams {
 }
 
 export default class ShaderProgram {
+  static Types = ShaderProgramTypes;
   private params: ShaderProgramParams;
   private gl: WebGLRenderingContext;
   private shaderSources: string[];
@@ -41,6 +49,7 @@ export default class ShaderProgram {
     attributes = {},
     uniforms = {},
   }: ShaderProgramParams) {
+    console.log(fragmentShader)
     this.gl = gl;
     this.shaderSources = [];
     this.shaderSources[this.gl.VERTEX_SHADER] = vertexShader;
@@ -94,26 +103,26 @@ export default class ShaderProgram {
 
   private sendVectorAttribute(
     dimension: number,
-    buffer: WebGLBuffer,
-    attribLocation: number,
-    values: number[],
+    {
+      buffer,
+      location,
+      data,
+    }: ShaderAttribute,
   ): void {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-    this.gl.vertexAttribPointer(attribLocation, dimension, this.gl.FLOAT, false, 0, 0);
-    this.gl.enableVertexAttribArray(attribLocation);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(values), this.gl.DYNAMIC_DRAW);
+    this.gl.vertexAttribPointer(
+      location, dimension, this.gl.FLOAT, false, 0, 0);
+    this.gl.enableVertexAttribArray(location);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER, new Float32Array(<number[]>data), this.gl.DYNAMIC_DRAW);
   }
 
   public sendAttributes() {
     Object.keys(this.attributes).forEach((key: string) => {
       const attribute = this.attributes[key];
       switch (attribute.type) {
-        case 'vec2':
-          this.sendVectorAttribute(
-            2,
-            attribute.buffer,
-            attribute.location,
-            <number[]>attribute.data);
+        case ShaderProgramTypes.VECTOR2:
+          this.sendVectorAttribute(2, attribute);
           break;
         default:
           throw new Error(`Invalid type provided for attribute ${key} provided.`);
@@ -121,11 +130,30 @@ export default class ShaderProgram {
     })
   }
 
-  public setAttributeData(attrbuteName: string, data: number | number[]) {
+  public sendUniforms() {
+    Object.keys(this.uniforms).forEach((key: string) => {
+      const uniform = this.uniforms[key];
+      if (uniform.sampler) return;
+      switch (uniform.type) {
+        case ShaderProgramTypes.FLOAT:
+          this.gl.uniform1f(
+            uniform.location, <number>uniform.data);
+          break;
+        case ShaderProgramTypes.VECTOR2:
+          this.gl.uniform2fv(
+            uniform.location, new Float32Array(<number[]>uniform.data));
+          break;
+        default:
+          throw new Error(`Invalid type provided for uniform ${key} provided.`);
+      }
+    });
+  }
+
+  public setAttributeData(attrbuteName: string, data: number|number[]) {
     this.attributes[attrbuteName].data = data;
   }
 
-  public setUniformData(uniformName: string, data: number | number[]) {
+  public setUniformData(uniformName: string, data: number|number[]) {
     this.uniforms[uniformName].data = data;
   }
 

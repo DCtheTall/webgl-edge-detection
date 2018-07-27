@@ -15,9 +15,6 @@ export default class Scene {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.viewport(0, 0, canvas.width, canvas.height);
 
-    this.vertexBuffer = this.gl.createBuffer();
-    this.textureCoordBuffer = this.gl.createBuffer();
-
     this.shaderProgram = new ShaderProgram({
       gl: this.gl,
       fragmentShader: require('../shaders/fragment.glsl'),
@@ -25,33 +22,45 @@ export default class Scene {
       attributes: {
         aTextureCoord: {
           locationName: 'a_TextureCoord',
-          type: 'vec2',
+          type: ShaderProgram.Types.VECTOR2,
+          data: [0, 0, 0, 1, 1, 0, 1, 1],
         },
         aVertexPosition: {
           locationName: 'a_VertexPosition',
-          type: 'vec2',
+          type: ShaderProgram.Types.VECTOR2,
+          data: [-1, 1, -1, -1, 1, 1, 1, -1],
         },
       },
       uniforms: {
         uTextureSampler2D: {
           locationName: 'u_TextureSampler',
-        }
-      }
+          sampler: true,
+        },
+        uResolution: {
+          locationName: 'u_Resolution',
+          type: ShaderProgram.Types.VECTOR2,
+          data: [canvas.width, canvas.height],
+        },
+        uStrongThreshold: {
+          locationName: 'u_StrongThreshold',
+          type: ShaderProgram.Types.FLOAT,
+          data: 0.3,
+        },
+        uWeakThreshold: {
+          locationName: 'u_WeakThreshold',
+          type: ShaderProgram.Types.FLOAT,
+          data: 0.15,
+        },
+      },
     });
     this.shaderProgram.useProgram();
 
-    this.shaderProgram.setAttributeData(
-      'aVertexPosition', [-1, 1, -1, -1, 1, 1, 1, -1]);
-    this.shaderProgram.setAttributeData(
-      'aTextureCoord', [
-        0, 0, 0, 1, 1, 0, 1, 1]);
-
     this.shaderProgram.sendAttributes();
+    this.shaderProgram.sendUniforms();
   }
 
   public setTexture(image: HTMLImageElement) {
     const texture = this.gl.createTexture();
-    // const isPowerOfTwo = (val: number): boolean => !(val & (val - 1));
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texImage2D(
       this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
