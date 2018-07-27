@@ -44,12 +44,12 @@ export default class Scene {
         uStrongThreshold: {
           locationName: 'u_StrongThreshold',
           type: ShaderProgram.Types.FLOAT,
-          data: 0.3,
+          data: 75,
         },
         uWeakThreshold: {
           locationName: 'u_WeakThreshold',
           type: ShaderProgram.Types.FLOAT,
-          data: 0.15,
+          data: 50,
         },
       },
     });

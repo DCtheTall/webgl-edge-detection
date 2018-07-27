@@ -59,7 +59,9 @@ vec2 getTextureIntensityGradient(
   float iY1 = getTextureIntensity(
     textureSampler, vec2(textureCoord.x, y1), resolution);
 
-  return vec2(iX1 - iX0, iY1 - iY0);
+  return vec2(
+    (iX1 - iX0) / (2. * gradientStep.x),
+    (iY1 - iY0) / (2. * gradientStep.y));
 }
 
 #pragma glslify: export(getTextureIntensityGradient);
