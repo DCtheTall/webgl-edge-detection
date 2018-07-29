@@ -111,6 +111,8 @@ export default class Shader {
       data,
     }: ShaderAttribute,
   ): void {
+    if (typeof data === 'number')
+      throw new Error('You must use number[] type for data for vector attribute.');
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
     this.gl.vertexAttribPointer(
       location, dimension, this.gl.FLOAT, false, 0, 0);

@@ -23,13 +23,30 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+}
+
+.controller {
+  margin-left: 20px;
+}
+
+.controller > div {
+  margin-bottom: 15px;
 }
 
 .image-upload {
-  margin-top: 10px;
+  margin-left: 20px;
 }
 
 .image-upload * {
   font-size: 16px;
+}
+
+.image-upload .error-text div {
+  font-size: 16px;
+  color: #f54;
+  margin-top: 10px;
+}
+
+.threshold-sliders .slider-label {
+
 }

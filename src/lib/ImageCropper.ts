@@ -76,7 +76,6 @@ export default class ImageCropper {
       return this.complete(new Error('Image must be at least 512px by 512px'), null);
 
     const sideLength = this.getNewSideLength();
-
     this.srcCanvas.width = this.image.width;
     this.srcCanvas.height = this.image.height;
     this.srcContext.drawImage(this.image, 0, 0);
