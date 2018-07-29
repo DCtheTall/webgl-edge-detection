@@ -2,8 +2,13 @@ html
   head
     title WebGL Edge Detection
     link(rel="stylesheet" href="/styles.css")
+    script(type="text/javascript")
+      | window.__DEV__ = !{dev}
   body
     .container
       canvas(id="canvas" width="512" height="512")
-    img(id="test-image" src="/puppy.jpg" style="display:none;")
+      .image-upload
+        input#file-input(type="file")
+        button#upload-image-button Upload Image
+    img#test-image(src="/puppy.jpg")
     script(src="/dist/bundle.js" type="text/javascript")

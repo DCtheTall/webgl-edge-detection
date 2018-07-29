@@ -3,7 +3,6 @@ enum ShaderProgramTypes {
   VECTOR2,
 }
 
-
 interface ShaderValue {
   type?: ShaderProgramTypes;
   locationName: string;
@@ -20,7 +19,7 @@ interface ShaderUniform extends ShaderValue {
   sampler?: boolean;
 }
 
-interface ShaderProgramParams {
+interface ShaderConstructorParams {
   gl: WebGLRenderingContext;
   vertexShader: string;
   fragmentShader: string;
@@ -32,9 +31,9 @@ interface ShaderProgramParams {
   };
 }
 
-export default class ShaderProgram {
+export default class Shader {
   static Types = ShaderProgramTypes;
-  private params: ShaderProgramParams;
+  private params: ShaderConstructorParams;
   private gl: WebGLRenderingContext;
   private shaderSources: string[];
   private program: WebGLProgram;
@@ -48,14 +47,17 @@ export default class ShaderProgram {
     fragmentShader,
     attributes = {},
     uniforms = {},
-  }: ShaderProgramParams) {
-    console.log(fragmentShader)
+  }: ShaderConstructorParams) {
+    if ((<any>window).__DEV__) {
+      console.log('VERTEX SHADER:\n', vertexShader, '\n');
+      console.log('FRAGMENT SHADER:\n', fragmentShader, '\n');
+    }
     this.gl = gl;
     this.shaderSources = [];
     this.shaderSources[this.gl.VERTEX_SHADER] = vertexShader;
     this.shaderSources[this.gl.FRAGMENT_SHADER] = fragmentShader;
     this.attributes = attributes;
-   this.uniforms = uniforms;
+    this.uniforms = uniforms;
     this.initShaderProgram();
   }
 

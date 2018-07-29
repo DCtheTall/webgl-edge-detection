@@ -1,5 +1,17 @@
+canvas {
+  background: #000;
+}
+
 html {
   background: #efefef;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+img {
+  display: none;
 }
 
 .container {
@@ -11,8 +23,13 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
-canvas {
-  background: #000;
+.image-upload {
+  margin-top: 10px;
+}
+
+.image-upload * {
+  font-size: 16px;
 }
