@@ -1,4 +1,5 @@
 enum ShaderProgramTypes {
+  BOOL,
   FLOAT,
   VECTOR2,
 }
@@ -139,6 +140,10 @@ export default class Shader {
       const uniform = this.uniforms[key];
       if (uniform.sampler) return;
       switch (uniform.type) {
+        case ShaderProgramTypes.BOOL:
+          this.gl.uniform1i(
+            uniform.location, <number>uniform.data);
+          break;
         case ShaderProgramTypes.FLOAT:
           this.gl.uniform1f(
             uniform.location, <number>uniform.data);

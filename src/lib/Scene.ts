@@ -65,6 +65,11 @@ export default class Scene {
           type: Shader.Types.FLOAT,
           data: weakEdgeThreshold,
         },
+        uUseEdgeDetection: {
+          locationName: 'u_UseEdgeDetection',
+          type: Shader.Types.BOOL,
+          data: 1,
+        }
       },
     });
     this.shader.useProgram();

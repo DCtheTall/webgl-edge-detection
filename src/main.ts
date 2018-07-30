@@ -9,6 +9,7 @@ let weakThresholdSlider: HTMLInputElement;
 let imageUploadController: HTMLDivElement;
 let toggleVideoButton: HTMLButtonElement;
 let localStream: MediaStream;
+let toggleEdgeDetectionInput: HTMLInputElement;
 
 function addError(msg: string) {
   errorText.innerHTML = msg;
@@ -53,6 +54,11 @@ function renderSceneWithVideo(scene: Scene) {
   scene.shader.setUniformData('uResolution', [video.width, video.height]);
   scene.render();
   window.requestAnimationFrame(renderSceneWithVideo.bind(null, scene));
+}
+
+function handleEdgeDetectionToggle(scene: Scene, e: any) {
+  scene.shader.setUniformData('uUseEdgeDetection', Number(e.target.checked));
+  if (!scene.usingVideo) renderSceneWithImage(scene);
 }
 
 async function handleToggleVideo(scene: Scene): Promise<void> {
@@ -115,6 +121,8 @@ async function handleToggleVideo(scene: Scene): Promise<void> {
     <HTMLDivElement>document.getElementById('image-upload');
   toggleVideoButton =
     <HTMLButtonElement>document.getElementById('toggle-video');
+  toggleEdgeDetectionInput =
+    <HTMLInputElement>document.getElementById('toggle-edge-detection');
 
   image.onload = renderSceneWithImage.bind(null, scene);
   strongThresholdSlider.addEventListener(
@@ -123,4 +131,6 @@ async function handleToggleVideo(scene: Scene): Promise<void> {
     'change', (e: any) => handleWeakThresholdChange(scene, e.target.value));
   toggleVideoButton.addEventListener(
     'click', handleToggleVideo.bind(null, scene));
+  toggleEdgeDetectionInput.addEventListener(
+    'change', handleEdgeDetectionToggle.bind(null, scene));
 })();
