@@ -1,8 +1,22 @@
 import Scene from './lib/Scene';
 import ImageCropper from './lib/ImageCropper';
 
+let image: HTMLImageElement;
+let video: HTMLVideoElement;
+let errorText: HTMLDivElement;
 let strongThresholdSlider: HTMLInputElement;
 let weakThresholdSlider: HTMLInputElement;
+let imageUploadController: HTMLDivElement;
+let toggleVideoButton: HTMLButtonElement;
+let localStream: MediaStream;
+
+function addError(msg: string) {
+  errorText.innerHTML = msg;
+  setTimeout(() =>
+    errorText.innerHTML === msg ?
+      errorText.innerHTML = ''
+      : null, 5e3);
+}
 
 function setWeakThresholdLabel(value: number) {
   const label = <HTMLDivElement>document.getElementById('weak-threshold-label');
@@ -29,28 +43,60 @@ function handleStrongThresholdChange(scene: Scene, value: number) {
   scene.render();
 }
 
-function renderScene(image: HTMLImageElement, scene: Scene): void {
+function renderSceneWithImage(scene: Scene) {
   scene.shader.setUniformData('uResolution', [image.width, image.height]);
-  scene.setTexture(image);
+  scene.setImageTexture(image);
+  scene.render();
+}
+
+function renderSceneWithVideo(scene: Scene) {
+  scene.shader.setUniformData('uResolution', [video.width, video.height]);
+  scene.render();
+  window.requestAnimationFrame(renderSceneWithVideo.bind(null, scene));
+}
+
+async function handleToggleVideo(scene: Scene): Promise<void> {
+  if (scene.usingVideo) {
+    imageUploadController.style.display = 'block';
+    toggleVideoButton.innerHTML = 'Use webcam';
+    localStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+    localStream = null;
+    video.srcObject = null;
+    window.cancelAnimationFrame(0);
+    renderSceneWithImage(scene);
+  } else {
+    try {
+      imageUploadController.style.display = 'none';
+      toggleVideoButton.innerHTML = 'Use image';
+      localStream =
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      video.srcObject = localStream;
+      video.play();
+      video.addEventListener('playing', () => {
+        scene.setVideoTexture(video);
+        renderSceneWithVideo(scene);
+      });
+    } catch (err) {
+      addError(
+        'Failed to start start webcam, make sure you allow this site to use your camera.');
+    }
+  }
   scene.render();
 }
 
 (async function main(): Promise<void> {
-  const image = <HTMLImageElement>document.getElementById('test-image');
+  image = <HTMLImageElement>document.getElementById('image');
+  video = <HTMLVideoElement>document.getElementById('video');
+  errorText = <HTMLDivElement>document.getElementById('error-text');
+
   const canvas = <HTMLCanvasElement>document.getElementById('canvas');
-  const errorText = <HTMLDivElement>document.getElementById('error-text');
   const imageCropper = new ImageCropper({
     button: <HTMLButtonElement>document.getElementById('upload-image-button'),
     input: <HTMLInputElement>document.getElementById('file-input'),
     maxFileSize: 1e6,
     complete(err: Error, imageUrl: string) {
       if (err) {
-        let msg = err.message;
-        errorText.innerHTML = msg;
-        setTimeout(() =>
-          errorText.innerHTML === msg ?
-            errorText.innerHTML  = ''
-            : null, 5e3);
+        addError(err.message);
       }
       else image.src = imageUrl;
     },
@@ -60,14 +106,21 @@ function renderScene(image: HTMLImageElement, scene: Scene): void {
     strongEdgeThreshold: 80,
     weakEdgeThreshold: 30,
   });
+
   strongThresholdSlider =
     <HTMLInputElement>document.getElementById('strong-threshold-slider');
   weakThresholdSlider =
     <HTMLInputElement>document.getElementById('weak-threshold-slider');
+  imageUploadController =
+    <HTMLDivElement>document.getElementById('image-upload');
+  toggleVideoButton =
+    <HTMLButtonElement>document.getElementById('toggle-video');
 
-  image.onload = renderScene.bind(null, image, scene);
+  image.onload = renderSceneWithImage.bind(null, scene);
   strongThresholdSlider.addEventListener(
     'change', (e: any) => handleStrongThresholdChange(scene, e.target.value));
   weakThresholdSlider.addEventListener(
     'change', (e: any) => handleWeakThresholdChange(scene, e.target.value));
+  toggleVideoButton.addEventListener(
+    'click', handleToggleVideo.bind(null, scene));
 })();

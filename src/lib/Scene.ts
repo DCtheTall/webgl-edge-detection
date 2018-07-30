@@ -11,8 +11,14 @@ export default class Scene {
   private vertexBuffer: WebGLBuffer;
   private textureCoordBuffer: WebGLBuffer;
   private texture: WebGLTexture;
+  private video: HTMLVideoElement;
 
   public shader: Shader;
+  public usingVideo: boolean;
+
+  static isPowerOfTwo(n: number): boolean {
+    return (n & (n - 1)) === 0;
+  }
 
   constructor({
     canvas,
@@ -64,6 +70,11 @@ export default class Scene {
     this.shader.useProgram();
   }
 
+  private updateVideoTexture() {
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.video);
+  }
+
   public setWeakThreshold(value: number) {
     this.shader.setUniformData('uWeakThreshold', value);
   }
@@ -73,17 +84,40 @@ export default class Scene {
     this.setWeakThreshold(value / 2);
   }
 
-  public setTexture(image: HTMLImageElement) {
+  public setImageTexture(image: HTMLImageElement) {
     const texture = this.gl.createTexture();
+    this.usingVideo = false;
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
     this.gl.texImage2D(
       this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
-    this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    if (Scene.isPowerOfTwo(image.width)) {
+      this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    } else {
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    }
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.uniform1i(this.shader.uniforms.uTextureSampler2D.location, 0);
+  }
+
+  public setVideoTexture(video: HTMLVideoElement) {
+    const texture = this.gl.createTexture();
+    const pixel = new Uint8Array([0, 0, 0, 255]);
+    this.usingVideo = true;
+    this.video = video;
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, pixel);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
     this.gl.activeTexture(this.gl.TEXTURE0);
     this.gl.uniform1i(this.shader.uniforms.uTextureSampler2D.location, 0);
   }
 
   public render() {
+    if (this.usingVideo) this.updateVideoTexture();
     this.shader.sendAttributes();
     this.shader.sendUniforms();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

@@ -14,6 +14,10 @@ img {
   display: none;
 }
 
+video {
+  display: none;
+}
+
 .container {
   position: fixed;
   left: 0;
@@ -29,24 +33,15 @@ img {
   margin-left: 20px;
 }
 
+.controller * {
+  font-size: 16px;
+}
+
 .controller > div {
   margin-bottom: 15px;
 }
 
-.image-upload {
-  margin-left: 20px;
-}
-
-.image-upload * {
-  font-size: 16px;
-}
-
-.image-upload .error-text div {
-  font-size: 16px;
+.error-text div {
   color: #f54;
   margin-top: 10px;
-}
-
-.threshold-sliders .slider-label {
-
 }
