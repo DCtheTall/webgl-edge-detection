@@ -5,9 +5,10 @@
   "main": "bin/start.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bin/start",
+    "start": "NODE_ENV=development node bin/start",
     "dev": "webpack --mode development --progress --watch",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "heroku-postbuild": "npm run build"
   },
   "author": "Dylan Cutler",
   "license": "ISC",
