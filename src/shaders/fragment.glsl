@@ -1,6 +1,6 @@
 precision highp float;
 
-#pragma glslify: cannyEdgeDetection = require('./lib/canny-edge-detection.glsl');
+#pragma glslify: cannyEdgeDetection = require('glsl-canny-edge-detection');
 
 uniform vec2 u_Resolution;
 uniform sampler2D u_TextureSampler;
