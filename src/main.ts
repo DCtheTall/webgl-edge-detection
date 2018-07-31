@@ -30,14 +30,16 @@ function setStrongThresholdLabel(value: number) {
 }
 
 function handleWeakThresholdChange(scene: Scene, value: number, render: boolean = true) {
-  scene.setWeakThreshold(value);
-  setWeakThresholdLabel(value);
+  const normalizedValue = value / 100;
+  scene.setWeakThreshold(normalizedValue);
+  setWeakThresholdLabel(normalizedValue);
   if (render) scene.render();
 }
 
 function handleStrongThresholdChange(scene: Scene, value: number) {
-  scene.setStrongThreshold(value);
-  setStrongThresholdLabel(value);
+  const normalizedValue = value / 100;
+  scene.setStrongThreshold(normalizedValue);
+  setStrongThresholdLabel(normalizedValue);
   weakThresholdSlider.setAttribute('max', String(value));
   weakThresholdSlider.value = String(value / 2);
   handleWeakThresholdChange(scene, value / 2, false);
@@ -109,8 +111,8 @@ async function handleToggleVideo(scene: Scene): Promise<void> {
   });
   const scene = new Scene({
     canvas,
-    strongEdgeThreshold: 80,
-    weakEdgeThreshold: 30,
+    strongEdgeThreshold: .1,
+    weakEdgeThreshold: .05,
   });
 
   strongThresholdSlider =

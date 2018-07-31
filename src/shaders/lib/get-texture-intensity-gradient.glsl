@@ -26,7 +26,7 @@ float getTextureIntensity(
   vec2 resolution
 ) {
   vec3 color = getBlurredTextureColor(textureSampler, textureCoord, resolution);
-  return pow(length(clamp(color, vec3(0.), vec3(1.))), 2.);
+  return pow(length(clamp(color, vec3(0.), vec3(1.))), 2.) / 3.;
 }
 
 /**
@@ -59,9 +59,7 @@ vec2 getTextureIntensityGradient(
   float iY1 = getTextureIntensity(
     textureSampler, vec2(textureCoord.x, y1), resolution);
 
-  return vec2(
-    (iX1 - iX0) / (2. * gradientStep.x),
-    (iY1 - iY0) / (2. * gradientStep.y));
+  return vec2(iX1 - iX0, iY1 - iY0);
 }
 
 #pragma glslify: export(getTextureIntensityGradient);

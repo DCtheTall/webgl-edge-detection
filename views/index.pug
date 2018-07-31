@@ -12,10 +12,10 @@ html
           input#file-input(type="file")
           button#upload-image-button Upload Image
         .threshold-sliders
-          #strong-threshold-label Strong edge threshold: 80
-          input#strong-threshold-slider(type="range" value="80" min="1" max="200")
-          #weak-threshold-label Weak edge threshold: 30
-          input#weak-threshold-slider(type="range" value="80" min="1" max="80")
+          #strong-threshold-label Strong edge threshold: .15
+          input#strong-threshold-slider(type="range" value="10" min="1" max="25")
+          #weak-threshold-label Weak edge threshold: .075
+          input#weak-threshold-slider(type="range" value="5" min="1" max="10")
         div
           button#toggle-video Use webcam
         div
