@@ -111,8 +111,8 @@ async function handleToggleVideo(scene: Scene): Promise<void> {
   });
   const scene = new Scene({
     canvas,
-    strongEdgeThreshold: .1,
-    weakEdgeThreshold: .05,
+    strongEdgeThreshold: .3,
+    weakEdgeThreshold: .15,
   });
 
   strongThresholdSlider =

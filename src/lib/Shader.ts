@@ -49,9 +49,11 @@ export default class Shader {
     attributes = {},
     uniforms = {},
   }: ShaderConstructorParams) {
+    const addLineNumbers = (shader: string) =>
+      shader.split('\n').map((s: string, i: number) => `${i + 1}. ${s}`).join('\n');
     if ((<any>window).__DEV__) {
-      console.log('VERTEX SHADER:\n', vertexShader, '\n');
-      console.log('FRAGMENT SHADER:\n', fragmentShader, '\n');
+      console.log('VERTEX SHADER:\n', addLineNumbers(vertexShader), '\n');
+      console.log('FRAGMENT SHADER:\n', addLineNumbers(fragmentShader), '\n');
     }
     this.gl = gl;
     this.shaderSources = [];

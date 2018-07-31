@@ -13,12 +13,7 @@ The algorithm is broken into the following steps:
 1. Apply a 5-pixel Gaussian blur to the image. This program uses the open source library
 [glsl-fast-gaussian-blur](https://github.com/Jam3/glsl-fast-gaussian-blur).
 
-2. Calculate the texture intensity gradient.
-It calculates intensity values in [0, 1],
-0 being true black, 1 being true white.
-It measures how it changes with respect to each
-component of the UV coordinates of the texture.
-This is done using a simple linear approximation. 
+2. Calculate the texture intensity gradient using a 3x3 Sobel operator.
 
 3. Round the gradient to 1 of the 8 cardinal directions.
 This is done by seeing which direction has the highest
