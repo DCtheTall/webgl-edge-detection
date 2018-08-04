@@ -58,7 +58,7 @@ export default class ImageCropper {
     if (!file || !file.size)
       return this.complete(new Error('Image failed to upload'), null);
     if (file && file.size >= this.maxFileSize)
-      return this.complete(new Error('File size cannot exceed 200KB'), null);
+      return this.complete(new Error('File size cannot exceed 1GB'), null);
     if (!(<any>['png', 'jpg']).includes(extension))
       return this.complete(new Error('You must use .png or .jpg'), null);
 

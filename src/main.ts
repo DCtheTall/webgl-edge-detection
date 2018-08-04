@@ -74,10 +74,10 @@ async function handleToggleVideo(scene: Scene): Promise<void> {
     renderSceneWithImage(scene);
   } else {
     try {
-      imageUploadController.style.display = 'none';
-      toggleVideoButton.innerHTML = 'Use image';
       localStream =
         await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      imageUploadController.style.display = 'none';
+      toggleVideoButton.innerHTML = 'Use image';
       video.srcObject = localStream;
       video.play();
       video.addEventListener('playing', () => {

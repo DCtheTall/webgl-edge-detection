@@ -15,7 +15,7 @@ void main() {
   float edge = cannyEdgeDetection(
     u_TextureSampler, v_TextureCoord, u_Resolution, u_WeakThreshold, u_StrongThreshold);
   if (u_UseEdgeDetection) {
-    gl_FragColor = vec4(vec3(edge), 1.);
+    gl_FragColor = vec4(vec3(1. - edge), 1.);
   } else {
     gl_FragColor = texture2D(u_TextureSampler, v_TextureCoord);
   }
