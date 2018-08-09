@@ -101,7 +101,6 @@ async function handleToggleVideo(scene: Scene): Promise<void> {
   const imageCropper = new ImageCropper({
     button: <HTMLButtonElement>document.getElementById('upload-image-button'),
     input: <HTMLInputElement>document.getElementById('file-input'),
-    maxFileSize: 1e6,
     complete(err: Error, imageUrl: string) {
       if (err) {
         addError(err.message);

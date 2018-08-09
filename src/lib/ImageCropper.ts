@@ -1,7 +1,6 @@
 interface ImageUploaderConstructorParams {
   input: HTMLInputElement;
   button: HTMLButtonElement;
-  maxFileSize?: number;
   complete: (err: Error, imageUrl: string) => void;
 }
 
@@ -19,7 +18,6 @@ export default class ImageCropper {
   constructor({
     input,
     button,
-    maxFileSize,
     complete,
   }: ImageUploaderConstructorParams) {
     button.addEventListener('click', this.onButtonClick.bind(this));
@@ -33,7 +31,7 @@ export default class ImageCropper {
     this.srcContext = this.srcCanvas.getContext('2d');
     this.dstCanvas = document.createElement('canvas');
     this.dstContext = this.dstCanvas.getContext('2d');
-    this.maxFileSize = maxFileSize || 3e5;
+    this.maxFileSize = 1e6;
     this.complete = complete;
   }
 
@@ -58,7 +56,7 @@ export default class ImageCropper {
     if (!file || !file.size)
       return this.complete(new Error('Image failed to upload'), null);
     if (file && file.size >= this.maxFileSize)
-      return this.complete(new Error('File size cannot exceed 1GB'), null);
+      return this.complete(new Error('File size cannot exceed 1MD'), null);
     if (!(<any>['png', 'jpg']).includes(extension))
       return this.complete(new Error('You must use .png or .jpg'), null);
 
